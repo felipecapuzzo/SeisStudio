@@ -5,7 +5,7 @@
 class AcousticWavefield
 {
     public:
-    explicit AcousticWavefield(const RegularGrid &grid);
+    explicit AcousticWavefield(const ComputationalGrid &grid);
       ~AcousticWavefield();
 
       void swap();

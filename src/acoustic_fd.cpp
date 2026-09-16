@@ -2,9 +2,10 @@
 #include "model.hpp"
 #include "wavefield.hpp"
 #include "geometry.hpp"
+#include <algorithm>
 #include <iostream>
 
-void acoustic_fd_step(AcousticWavefield &u, const AcousticModel &model, const RegularGrid &grid, float dt)
+void acoustic_fd_step(AcousticWavefield &u, const AcousticModel &model, const ComputationalGrid &grid, float dt)
 {
     float dt2 = dt * dt;
 
@@ -14,9 +15,9 @@ void acoustic_fd_step(AcousticWavefield &u, const AcousticModel &model, const Re
         {
             size_t ind = z + x * grid.nz;
 
-            float du2dz2 = (-1.0f / 560.0f * (u.current[ind + 4] + u.current[ind - 4]) + 8.0f / 315.0f * (u.current[ind + 3] + u.current[ind - 3]) - 1.0f / 5.0f * (u.current[ind + 2] + u.current[ind - 2]) + 8.0f / 5.0f * (u.current[ind + 1] + u.current[ind - 1]) - 205.0f / 72.0f * u.current[ind]) / grid.dz / grid.dz;
+            float du2dz2 = (-1.0f / 560.0f * (u.current[ind + 4] + u.current[ind - 4]) + 8.0f / 315.0f * (u.current[ind + 3] + u.current[ind - 3]) - 1.0f / 5.0f * (u.current[ind + 2] + u.current[ind - 2]) + 8.0f / 5.0f * (u.current[ind + 1] + u.current[ind - 1]) - 205.0f / 72.0f * u.current[ind]) / grid.model_grid.dz / grid.model_grid.dz;
 
-            float du2dx2 = (-1.0f / 560.0f * (u.current[ind + 4 * grid.nz] + u.current[ind - 4 * grid.nz]) + 8.0f / 315.0f * (u.current[ind + 3 * grid.nz] + u.current[ind - 3 * grid.nz]) - 1.0f / 5.0f * (u.current[ind + 2 * grid.nz] + u.current[ind - 2 * grid.nz]) + 8.0f / 5.0f * (u.current[ind + grid.nz] + u.current[ind - grid.nz]) - 205.0f / 72.0f * u.current[ind]) / grid.dx / grid.dx;
+            float du2dx2 = (-1.0f / 560.0f * (u.current[ind + 4 * grid.nz] + u.current[ind - 4 * grid.nz]) + 8.0f / 315.0f * (u.current[ind + 3 * grid.nz] + u.current[ind - 3 * grid.nz]) - 1.0f / 5.0f * (u.current[ind + 2 * grid.nz] + u.current[ind - 2 * grid.nz]) + 8.0f / 5.0f * (u.current[ind + grid.nz] + u.current[ind - grid.nz]) - 205.0f / 72.0f * u.current[ind]) / grid.model_grid.dx / grid.model_grid.dx;
 
             float lap = du2dx2 + du2dz2;
 
@@ -30,7 +31,7 @@ void AcousticFDSolver::RunShot(const ShotGeometry &shot_geometry,               
 {
     const size_t n_iterations = param.n_time_steps();
 
-    const size_t rec_ratio = get_ratio(seismogram.dt_rec, param.dt);
+    const size_t rec_ratio = std::max<size_t>(1, get_ratio(seismogram.dt_rec, param.dt));
 
     // allocate wavefields
     AcousticWavefield u(model.grid);

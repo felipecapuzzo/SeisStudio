@@ -1,7 +1,7 @@
 #include "wavefield.hpp"
 #include "geometry.hpp"
 
-AcousticWavefield::AcousticWavefield(const RegularGrid &grid)
+AcousticWavefield::AcousticWavefield(const ComputationalGrid &grid)
 {
     size_t n_points = grid.nx * grid.nz;
     current = new float[n_points]();

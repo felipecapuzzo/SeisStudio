@@ -6,21 +6,21 @@
 class AcousticModel
 {
 public:
-    explicit AcousticModel(RegularGrid &grid);
+    explicit AcousticModel(const ComputationalGrid &grid);
     void fill(float value);
     ~AcousticModel();
 
-    RegularGrid grid;
+    ComputationalGrid grid;
     float *vp = nullptr;
 };
 
 class ElasticModel
 {
 public:
-    ElasticModel(RegularGrid &grid);
+    explicit ElasticModel(const ComputationalGrid &grid);
     ~ElasticModel();
 
-    RegularGrid grid;
+    ComputationalGrid grid;
     float *vp = nullptr;
     float *vs = nullptr;
     float *rho = nullptr;;

@@ -68,11 +68,12 @@ public:
     ReceiverPosition receivers;
 };
 
-void inject_source(float *u, const SourcePosition &sources, const SourceTimeFunction &wavelet, const RegularGrid &grid, float dt, size_t n);
+class ComputationalGrid;
+
+void inject_source(float *u, const SourcePosition &sources, const SourceTimeFunction &wavelet, const ComputationalGrid &grid, float dt, size_t n);
 size_t get_ratio(float a, float b);
 float hicks_weight(float x, float r);
-void inject_source(float *u, const SourcePosition &sources, const SourceTimeFunction &wavelet, const RegularGrid &grid, float dt, size_t n);
-void record_receivers(const float *u, Seismogram &seismogram, const ReceiverPosition &receivers, const RegularGrid &grid, size_t n);
+void record_receivers(const float *u, Seismogram &seismogram, const ReceiverPosition &receivers, const ComputationalGrid &grid, size_t n);
 
 #pragma once
 
@@ -109,6 +110,13 @@ public:
     }
 
     RegularGrid model_grid;
+
+    size_t index(const Coordinates &coord) const
+    {
+        size_t iz = static_cast<size_t>((coord.z - model_grid.z0) / model_grid.dz);
+        size_t ix = static_cast<size_t>((coord.x - model_grid.x0) / model_grid.dx);
+        return model_index(iz, ix);
+    }
 
     size_t nx;
     size_t nz;

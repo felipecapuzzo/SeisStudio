@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QWidget>
 #include <QHBoxLayout>
+#include <algorithm>
 
 #include "geometry.hpp"
 #include "model.hpp"
@@ -29,6 +30,8 @@ int main(int argc, char *argv[])
     grid.dx = 10;
     grid.dz = 10;
 
+    ComputationalGrid computational_grid(grid, 100, false);
+
     SimulationParameters param;
 
     param.dt = 0.001;
@@ -36,9 +39,9 @@ int main(int argc, char *argv[])
 
     size_t n_samples_total = grid.nz * grid.nx;
 
-    AcousticWavefield u(grid);
+    AcousticWavefield u(computational_grid);
 
-    AcousticModel model(grid);
+    AcousticModel model(computational_grid);
     model.fill(2000);
 
     auto wavelet = SourceTimeFunction::Ricker(param.n_time_steps(), param.dt, 30, 0.1);
@@ -58,28 +61,28 @@ int main(int argc, char *argv[])
 
     size_t n_rec = shot.receivers.size();
 
-    // float* seismogram = new float[param.n_time_steps() * n_rec()];
-    Seismogram seismogram(501, shot.receivers.size(), 0.002);
+    const size_t n_iterations = param.n_time_steps();
+    const size_t rec_ratio = std::max<size_t>(1, get_ratio(0.002f, param.dt));
+    const size_t n_seismogram_samples =
+        n_iterations == 0 ? 0 : 1 + (n_iterations - 1) / rec_ratio;
+
+    Seismogram seismogram(n_seismogram_samples, shot.receivers.size(), 0.002);
 
     AcousticFDSolver forward_modeling(model, param);
 
-    float* snapshot = new float[grid.nx * grid.nz]();
+    float* snapshot = new float[computational_grid.nx * computational_grid.nz]();
 
 
     forward_modeling.RunShot(shot, wavelet, seismogram,snapshot);
 
-    io::ExportFloat32("teste.bin",grid.nx*grid.nz,model.vp);
+    io::ExportFloat32("teste.bin", computational_grid.nx * computational_grid.nz, model.vp);
     io::ExportFloat32("wavelet.bin",param.n_time_steps(),wavelet.signal);
 
-    float sum;
-    for (int i = 0; i < param.n_time_steps(); i++)
-    {
-        sum += wavelet.signal[i];
-    }
-    std::cout<<sum<<" "<<param.n_time_steps()<<std::endl;
+    
+    std::cout<< computational_grid.nz<<" "<<computational_grid.nx<<" "<<param.n_time_steps()<<std::endl;
 
     ImageView view;
-    view.setData(snapshot, grid.nx, grid.nz);
+    view.setData(snapshot, computational_grid.nx, computational_grid.nz);
     view.keepAspectRatio = true;
 
     QVBoxLayout layout(&main_window);

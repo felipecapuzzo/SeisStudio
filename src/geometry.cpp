@@ -6,11 +6,14 @@
 void record_receivers(const float *u,
                       Seismogram &seismogram,
                       const ReceiverPosition &receivers,
-                      const RegularGrid &grid,
+                      const ComputationalGrid &grid,
                       size_t n)
 {
     for (size_t r = 0; r < receivers.size(); r++)
     {
+        if (!seismogram.valid_index(n, r))
+            continue;
+
         const size_t ind_r = grid.index(receivers[r]);
         // const size_t ind_sismo = it + r*nt;
 
@@ -18,7 +21,7 @@ void record_receivers(const float *u,
     }
 }
 
-void inject_source(float *u, const SourcePosition &sources, const SourceTimeFunction &wavelet, const RegularGrid &grid, float dt, size_t n)
+void inject_source(float *u, const SourcePosition &sources, const SourceTimeFunction &wavelet, const ComputationalGrid &grid, float dt, size_t n)
 {
     for (size_t s = 0; s < sources.size(); s++)
     {

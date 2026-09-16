@@ -6,7 +6,7 @@
 #include "parameters.hpp"
 #include "seismogram.hpp"
 
-void acoustic_fd_step(AcousticWavefield &u, const AcousticModel &model, const RegularGrid &grid, float dt);
+void acoustic_fd_step(AcousticWavefield &u, const AcousticModel &model, const ComputationalGrid &grid, float dt);
 
 class AcousticFDSolver
 {
