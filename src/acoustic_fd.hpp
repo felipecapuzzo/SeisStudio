@@ -8,6 +8,8 @@
 
 void acoustic_fd_step(AcousticWavefield &u, const AcousticModel &model, const ComputationalGrid &grid, float dt);
 
+void apply_absorbing_boundary(float *u, const ComputationalGrid &grid);
+
 class AcousticFDSolver
 {
 public:

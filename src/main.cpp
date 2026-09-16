@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     // sources positions
 
     ShotGeometry shot;
-    shot.sources.add({1000.0f, 1500.0f});
+    shot.sources.add({100.0f, 1500.0f});
 
     // receiver line
     for (float x = 500.0f; x <= 2500.0f; x += 10.0f)
