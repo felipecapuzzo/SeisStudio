@@ -10,6 +10,9 @@ void acoustic_fd_step(AcousticWavefield &u, const AcousticModel &model, const Co
 
 void apply_absorbing_boundary(float *u, const ComputationalGrid &grid);
 
+void apply_free_surface(float *u, const ComputationalGrid &grid);
+
+
 class AcousticFDSolver
 {
 public:
@@ -23,3 +26,4 @@ private:
     const AcousticModel &model;
     const SimulationParameters &param;
 };
+

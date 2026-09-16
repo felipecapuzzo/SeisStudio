@@ -40,7 +40,11 @@ void AcousticFDSolver::RunShot(const ShotGeometry &shot_geometry, const SourceTi
     {
         acoustic_fd_step(u, model, model.grid, param.dt); // time step acoustic
 
+        apply_free_surface(u.next, model.grid);
+
         inject_source(u.next, shot_geometry.sources, wavelet, model.grid, param.dt, n); // inject wavelet
+
+        
 
         if (n % rec_ratio == 0)
             record_receivers(u.next, seismogram, shot_geometry.receivers, model.grid, n / rec_ratio); // recording seismogram
@@ -117,6 +121,26 @@ void apply_absorbing_boundary(float *u, const ComputationalGrid &grid)
             const float damping = x_abc * z_abc;
 
             u[z + grid.nz * x] *= damping;
+        }
+    }
+}
+
+void apply_free_surface(float *u, const ComputationalGrid &grid)
+{
+    const size_t zs = grid.model_z0;
+
+    for (size_t x = grid.model_x0;
+         x < grid.model_x0 + grid.model_grid.nx;
+         ++x)
+    {
+        // Pressure at the free surface
+        u[grid.index(zs, x)] = 0.0f;
+
+        // Antisymmetric extension into ghost points
+        for (size_t g = 1; g <= grid.ghost; ++g)
+        {
+            u[grid.index(zs - g, x)] =
+                -u[grid.index(zs + g, x)];
         }
     }
 }

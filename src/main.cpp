@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     grid.dx = 10;
     grid.dz = 10;
 
-    ComputationalGrid computational_grid(grid, 100, false);
+    ComputationalGrid computational_grid(grid, 100, true);
 
     SimulationParameters param;
 
@@ -63,8 +63,7 @@ int main(int argc, char *argv[])
 
     const size_t n_iterations = param.n_time_steps();
     const size_t rec_ratio = std::max<size_t>(1, get_ratio(0.002f, param.dt));
-    const size_t n_seismogram_samples =
-        n_iterations == 0 ? 0 : 1 + (n_iterations - 1) / rec_ratio;
+    const size_t n_seismogram_samples = n_iterations == 0 ? 0 : 1 + (n_iterations - 1) / rec_ratio;
 
     Seismogram seismogram(n_seismogram_samples, shot.receivers.size(), 0.002);
 
